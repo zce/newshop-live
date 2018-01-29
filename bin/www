@@ -1,6 +1,10 @@
 #!/usr/bin/env node
 
 /**
+ * 载入 app 对象，启动一个 HTTP 服务，监听一个指定的端口
+ */
+
+/**
  * Module dependencies.
  */
 

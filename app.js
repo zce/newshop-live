@@ -56,6 +56,7 @@ app.use((req, res, next) => {
 
 // 错误处理器
 app.use((err, req, res, next) => {
+  // locals 属性的作用就是 控制器 与 模板 之间的数据通道
   res.locals.status = err.status || 500
   res.locals.message = err.message
   res.locals.error = req.app.get('env') === 'development' ? err : {}

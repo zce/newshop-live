@@ -15,6 +15,9 @@ const sequelize = new Sequelize(Object.assign(config.database, {
   define: { timestamps: false }
 }))
 
+// 定义一个空对象存放所有的数据模型
+const models = {}
+
 // 自动载入当前目录下所有的 JS 文件
 glob.sync('*.js', { cwd: __dirname })
   // 忽略 index.js 文件，因为它不是模型文件
@@ -25,5 +28,7 @@ glob.sync('*.js', { cwd: __dirname })
     // 注意：这里的模型文件不能单独使用，必须通过 `sequelize.import()` 才可以使用
     const model = sequelize.import(item)
     // 将模型对象导出
-    exports[model.name] = model
+    models[model.name] = model
   })
+
+module.exports = models
