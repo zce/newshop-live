@@ -25,7 +25,8 @@ const transporter = nodemailer.createTransport(config.mail)
  */
 exports.sendEmail = (to, subject, content) => {
   const message = {
-    from: config.mail.auth.user,
+    // 收件人或者发件人的格式 可以 "名字" <邮箱地址>
+    from: `"${config.mail.name}" <${config.mail.auth.user}>`,
     to: to,
     subject: subject,
     html: content

@@ -4,14 +4,18 @@
 
 const uuid = require('uuid')
 const bcrypt = require('bcryptjs')
+
 const { User } = require('../models')
 const utils = require('../utils')
 
 exports.login = (req, res) => {
-  utils.sendEmail('w@zce.me', '么么哒', '<h2>萌萌哒</h2>')
-    .then(info => {
-      res.send(info.messageId)
-    })
+  res.render('login')
+}
+
+// POST /account/login
+exports.loginPost = (req, res) => {
+  const { username, password, remember } = req.body
+  res.send({ username, password, remember })
 }
 
 exports.register = (req, res) => {
@@ -53,6 +57,7 @@ exports.registerPost = (req, res) => {
       const newUser = new User()
       newUser.username = username
       newUser.user_email = email
+      newUser.user_email_code = uuid().substr(0, 12)
       const salt = bcrypt.genSaltSync(10)
       newUser.password = bcrypt.hashSync(password, salt)
       newUser.create_time = Date.now() / 1000
@@ -61,11 +66,9 @@ exports.registerPost = (req, res) => {
     })
     .then(user => {
       // user => 新建过后的用户信息（包含ID和那些默认值）
-      if (!user.user_id) throw new Error('注册失败')
-
-      const code = uuid()
+      if (!(user && user.user_id)) throw new Error('注册失败')
       // 发送激活邮箱邮件
-      const activeLink = `http://localhost:3000/account/active?code=${code}`
+      const activeLink = `http://localhost:3000/account/active?code=${user.user_email_code}`
 
       utils.sendEmail(email, '品优购邮箱激活', `<p><a href="${activeLink}">${activeLink}</a></p>`)
         .then(() => res.redirect('/account/login'))
@@ -77,6 +80,6 @@ exports.registerPost = (req, res) => {
 
 exports.active = (req, res) => {
   const { code } = req.query
-  // code 根谁对比
+  // TODO: 实现登录过后 再考虑如何激活用户邮箱问题 code 根谁对比
   res.send(code)
 }

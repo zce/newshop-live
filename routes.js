@@ -11,6 +11,7 @@ router.get('/list', homeController.list)
 router.get('/item', homeController.item)
 
 router.get('/account/login', accountController.login)
+router.post('/account/login', accountController.loginPost)
 router.get('/account/register', accountController.register)
 router.post('/account/register', accountController.registerPost)
 router.get('/account/active', accountController.active)
