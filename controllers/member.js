@@ -30,4 +30,5 @@ exports.index = (req, res) => {
         res.redirect('/account/login')
       })
   }
+  res.send(req.session.currentUser.username)
 }
