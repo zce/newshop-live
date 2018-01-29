@@ -13,6 +13,7 @@ router.get('/item', homeController.item)
 router.get('/account/login', accountController.login)
 router.get('/account/register', accountController.register)
 router.post('/account/register', accountController.registerPost)
+router.get('/account/active', accountController.active)
 
 // 导出路由对象
 module.exports = router

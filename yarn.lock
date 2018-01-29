@@ -2094,6 +2094,10 @@ node-pre-gyp@^0.6.39:
     tar "^2.2.1"
     tar-pack "^3.4.0"
 
+nodemailer@^4.4.2:
+  version "4.4.2"
+  resolved "http://registry.npm.taobao.org/nodemailer/download/nodemailer-4.4.2.tgz#f215fb88e8a1052f9f93083909e116d2b79fc8de"
+
 nodemon@^1.14.11:
   version "1.14.11"
   resolved "http://registry.npm.taobao.org/nodemon/download/nodemon-1.14.11.tgz#cc0009dd8d82f126f3aba50ace7e753827a8cebc"

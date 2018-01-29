@@ -1,11 +1,17 @@
 /**
  * 账号控制器
  */
+
+const uuid = require('uuid')
 const bcrypt = require('bcryptjs')
 const { User } = require('../models')
+const utils = require('../utils')
 
 exports.login = (req, res) => {
-  res.send('login')
+  utils.sendEmail('w@zce.me', '么么哒', '<h2>萌萌哒</h2>')
+    .then(info => {
+      res.send(info.messageId)
+    })
 }
 
 exports.register = (req, res) => {
@@ -55,11 +61,22 @@ exports.registerPost = (req, res) => {
     })
     .then(user => {
       // user => 新建过后的用户信息（包含ID和那些默认值）
-      console.log(user)
       if (!user.user_id) throw new Error('注册失败')
-      res.send('ok')
+
+      const code = uuid()
+      // 发送激活邮箱邮件
+      const activeLink = `http://localhost:3000/account/active?code=${code}`
+
+      utils.sendEmail(email, '品优购邮箱激活', `<p><a href="${activeLink}">${activeLink}</a></p>`)
+        .then(() => res.redirect('/account/login'))
     })
     .catch(e => {
       res.render('register', { msg: e.message })
     })
+}
+
+exports.active = (req, res) => {
+  const { code } = req.query
+  // code 根谁对比
+  res.send(code)
 }
