@@ -7,6 +7,7 @@ const path = require('path')
 
 // 载入第三方依赖模块
 const express = require('express')
+const session = require('express-session')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
 const morgan = require('morgan')
@@ -32,6 +33,9 @@ app.engine('hbs', hbs.express4())
 // 请求日志
 app.use(morgan('dev'))
 
+// public 文件夹的静态文件服务
+app.use(express.static(path.join(__dirname, 'public')))
+
 // json 格式请求体解析
 app.use(bodyParser.json())
 
@@ -41,8 +45,8 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // 请求头中的 cookie 解析
 app.use(cookieParser())
 
-// public 文件夹的静态文件服务
-app.use(express.static(path.join(__dirname, 'public')))
+// 支持 Session 
+app.use(session({ secret: 'this is a secret' }))
 
 // 挂载路由表
 app.use(routes)

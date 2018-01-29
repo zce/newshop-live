@@ -14,8 +14,64 @@ exports.login = (req, res) => {
 
 // POST /account/login
 exports.loginPost = (req, res) => {
-  const { username, password, remember } = req.body
-  res.send({ username, password, remember })
+  const { username, password, captcha, remember } = req.body
+  
+  res.locals.username = username
+  
+  // 1. 校验
+  if (!(username && password && captcha)) {
+    return res.render('login', { msg: '请完整填写登录信息' })
+  }
+  
+  // TODO: 验证码校验
+  if (captcha.toLowerCase() !== req.session.captcha.toLowerCase()) {
+    return res.render('login', { msg: '验证码不正确' })
+  }
+  
+  // 删除之前的验证码
+  delete req.session.captcha
+  
+  // ------------------------------------------------
+  // let where = { username: username }
+  
+  // if (username.includes('@')) {
+  //   // 邮箱登录
+  //   where = { user_email: username }
+  // }
+
+  // let currentUser
+
+  // // 2. 持久化
+  // User.findOne({ where })
+  // ------------------------------------------------
+  
+  const whereProp = username.includes('@') ? 'user_email' : 'username'
+  
+  let currentUser
+
+  // 2. 持久化
+  User.findOne({ where: { [whereProp] : username } })
+    .then(user => {
+      if (!user) throw new Error('用户名或密码错误')
+
+      currentUser = user
+
+      // 判断密码是否匹配
+      return bcrypt.compare(password, user.password)
+    })
+    .then(match => {
+      if (!match) throw new Error('用户名或密码错误')
+
+      // 用户名存在而且密码匹配 将当前登录用户信息存放到 session 中
+      req.session.currentUser = currentUser
+
+      // 3. 响应
+      res.redirect('/member')
+    })
+    .catch(e => {
+      // 如果出现异常再次显示登录页并展示错误消息
+      return res.render('login', { msg: e.message })
+    })
 }
 
 exports.register = (req, res) => {
@@ -78,8 +134,30 @@ exports.registerPost = (req, res) => {
     })
 }
 
-exports.active = (req, res) => {
+exports.active = (req, res, next) => {
   const { code } = req.query
+  
   // TODO: 实现登录过后 再考虑如何激活用户邮箱问题 code 根谁对比
-  res.send(code)
+  User.findOne({ where: { user_email_code: code } })
+    .then(user => {
+      // 已经取到当前这个验证码匹配的用户，当前登录的用户信息在 Session 中
+      // 判断是否为同一个用户
+      if (user.user_id !== req.session.currentUser.user_id) {
+        // 404 
+        const err = new Error('Not Found')
+        err.status = 404
+        return next(err)
+      }
+      
+      // 邮箱就是当前登录用户的
+      user.is_active = '是'
+      // 已经激活成功了，没必要再保存 code
+      user.user_email_code = ''
+      
+      // 再次保存当前用户信息（更新数据）
+      return user.save()
+    })
+    .then(user => {
+      res.redirect('/member')
+    })
 }

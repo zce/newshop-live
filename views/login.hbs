@@ -28,11 +28,16 @@
               <form action="/account/login" method="post" class="sui-form">
                 <div class="input-prepend">
                   <span class="add-on loginname"></span>
-                  <input type="text" name="username" class="span2 input-xfat" placeholder="用户名/邮箱">
+                  <input type="text" name="username" class="span2 input-xfat" placeholder="用户名/邮箱" value="{{username}}">
                 </div>
                 <div class="input-prepend">
                   <span class="add-on loginpwd"></span>
                   <input type="password" name="password" class="span2 input-xfat" placeholder="请输入密码">
+                </div>
+                <div class="input-prepend">
+                  <span class="add-on loginpwd"></span>
+                  <input type="text" name="captcha" class="span2 input-xfat" placeholder="请输入验证码">
+                  <img id="captcha" src="/captcha" data-original="/captcha">
                 </div>
                 <div class="setting">
                   <label class="checkbox inline"><input name="remember" type="checkbox"> 自动登录</label>
@@ -40,6 +45,7 @@
                 </div>
                 <div class="logined">
                   <button class="sui-btn btn-block btn-xlarge btn-danger">登&nbsp;&nbsp;录</button>
+                  {{#if msg}}<p style="color: red">{{msg}}</p>{{/if}}
                 </div>
               </form>
               <a href="register.html">立即注册</a>
@@ -68,6 +74,14 @@
   <script src="/assets/js/jquery.js"></script>
   <script src="/assets/js/sui.tab.js"></script>
   <script src="/assets/js/sui.transition.js"></script>
+  <script>
+    $(function ($) {
+      $('#captcha').on('click', function () {
+        // 如何让图片刷新
+        $(this).attr('src', $(this).data('original') + '?' + Date.now())
+      })
+    })
+  </script>
 </body>
 
 </html>
