@@ -23,13 +23,15 @@ exports.loginPost = (req, res) => {
     return res.render('login', { msg: '请完整填写登录信息' })
   }
   
-  // TODO: 验证码校验
-  if (captcha.toLowerCase() !== req.session.captcha.toLowerCase()) {
-    return res.render('login', { msg: '验证码不正确' })
-  }
+  const sessionCaptcha = req.session.captcha
   
   // 删除之前的验证码
   delete req.session.captcha
+  
+  // TODO: 验证码校验
+  if (captcha.toLowerCase() !== sessionCaptcha.toLowerCase()) {
+    return res.render('login', { msg: '验证码不正确' })
+  }
   
   // ------------------------------------------------
   // let where = { username: username }
@@ -64,6 +66,15 @@ exports.loginPost = (req, res) => {
 
       // 用户名存在而且密码匹配 将当前登录用户信息存放到 session 中
       req.session.currentUser = currentUser
+      
+      // 处理记住我
+      if (remember) {
+        // redirect + set cookie 把用户名和密码的密文存下来，下次自动登录
+        // cookie 的名称最好无任何意义
+        const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
+        // 可以使用可逆加密存储信息
+        res.cookie('last_logged_in_user', { uid: currentUser.user_id, pwd: currentUser.password }, { expires })
+      }
 
       // 3. 响应
       res.redirect('/member')
