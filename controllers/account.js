@@ -8,6 +8,7 @@ const bcrypt = require('bcryptjs')
 const { User } = require('../models')
 const utils = require('../utils')
 
+// GET /account/login
 exports.login = (req, res) => {
   res.render('login')
 }
@@ -85,10 +86,12 @@ exports.loginPost = (req, res) => {
     })
 }
 
+// GET /account/register
 exports.register = (req, res) => {
   res.render('register')
 }
 
+// POST /account/register
 exports.registerPost = (req, res) => {
   // 处理表单接收逻辑
   const { username, email, password, confirm, agree } = req.body
@@ -145,6 +148,7 @@ exports.registerPost = (req, res) => {
     })
 }
 
+// GET /account/active
 exports.active = (req, res, next) => {
   const { code } = req.query
   
