@@ -26,6 +26,7 @@ router.get('/account/active', auth.required, accountController.active)
 
 router.get('/member', auth.required, memberController.index)
 router.get('/member/profile', auth.required, memberController.profile)
+router.post('/member/profile', auth.required, memberController.profilePost)
 router.get('/member/address', auth.required, memberController.address)
 router.get('/member/order', auth.required, memberController.order)
 

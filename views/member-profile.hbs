@@ -9,18 +9,22 @@
     {{> member-sidebar}}
     <!--右侧主内容-->
     <div class="yui3-u-5-6 body">
+      {{!-- 一旦表单中有文件域，则表单的 method 和 enctype 必须设置为 post / multipart/form-data --}}
+      {{!-- 类似 with 语法 --}}
+      {{#currentUser}}
+      {{!-- 这里可以直接访问 currentUser 的属性 --}}
       <form class="sui-form form-horizontal profile-form" action="/member/profile" method="post" enctype="multipart/form-data">
         <div class="control-group">
           <label for="username" class="control-label">用户名：</label>
           <div class="controls">
-            <input type="text" id="username" class="input-xfat" value="zce" readonly>
+            <input type="text" id="username" class="input-xfat" value="{{username}}" readonly>
           </div>
         </div>
         <div class="control-group">
           <label for="avatar" class="control-label">头像：</label>
           <div class="controls">
             <label class="avatar-box">
-              <img src="/uploads/photo.jpg" width="80">
+              <img src="/uploads/avatar/{{user_id}}.png" width="80">
               <input type="file" id="avatar" name="avatar">
             </label>
           </div>
@@ -29,11 +33,11 @@
           <label class="control-label">性别：</label>
           <div class="controls">
             <label>
-              <input type="radio" name="user_sex" value="男" checked>
+              <input type="radio" name="user_sex" value="男"{{#equal user_sex '男'}} checked{{/equal}}>
               <span>男</span>
             </label>
             <label>
-              <input type="radio" name="user_sex" value="女">
+              <input type="radio" name="user_sex" value="女"{{#equal user_sex '女'}} checked{{/equal}}>
               <span>女</span>
             </label>
           </div>
@@ -41,39 +45,39 @@
         <div class="control-group">
           <label for="user_qq" class="control-label">QQ：</label>
           <div class="controls">
-            <input type="text" id="user_qq" class="input-xfat" name="user_qq" value="27102514">
+            <input type="text" id="user_qq" class="input-xfat" name="user_qq" value="{{user_qq}}">
           </div>
         </div>
         <div class="control-group">
           <label for="user_tel" class="control-label">手机：</label>
           <div class="controls">
-            <input type="text" id="user_tel" class="input-xfat" name="user_tel" value="">
+            <input type="text" id="user_tel" class="input-xfat" name="user_tel" value="{{user_tel}}">
           </div>
         </div>
         <div class="control-group">
           <label for="user_xueli" class="control-label">学历：</label>
           <div class="controls">
             <select name="user_xueli" id="user_xueli" class="input-xfat">
-              <option>小学</option>
-              <option>初中</option>
-              <option>高中</option>
-              <option>专科</option>
-              <option selected>本科</option>
-              <option>硕士</option>
-              <option>博士</option>
+              <option{{#equal user_xueli '小学'}} selected{{/equal}}>小学</option>
+              <option{{#equal user_xueli '初中'}} selected{{/equal}}>初中</option>
+              <option{{#equal user_xueli '高中'}} selected{{/equal}}>高中</option>
+              <option{{#equal user_xueli '专科'}} selected{{/equal}}>专科</option>
+              <option{{#equal user_xueli '本科'}} selected{{/equal}}>本科</option>
+              <option{{#equal user_xueli '硕士'}} selected{{/equal}}>硕士</option>
+              <option{{#equal user_xueli '博士'}} selected{{/equal}}>博士</option>
             </select>
           </div>
         </div>
         <div class="control-group">
           <label for="user_hobby" class="control-label">兴趣：</label>
           <div class="controls">
-            <textarea id="user_hobby" class="input-xfat" name="user_hobby" cols="80" rows="3"></textarea>
+            <textarea id="user_hobby" class="input-xfat" name="user_hobby" cols="80" rows="3">{{user_hobby}}</textarea>
           </div>
         </div>
         <div class="control-group">
           <label for="user_introduce" class="control-label">简介：</label>
           <div class="controls">
-            <textarea id="user_introduce" class="input-xfat" name="user_introduce" cols="80" rows="6"></textarea>
+            <textarea id="user_introduce" class="input-xfat" name="user_introduce" cols="80" rows="6">{{user_introduce}}</textarea>
           </div>
         </div>
         <div class="control-group">
@@ -83,6 +87,7 @@
           </div>
         </div>
       </form>
+      {{/currentUser}}
     </div>
   </div>
 </div>

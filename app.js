@@ -30,6 +30,16 @@ app.engine('hbs', hbs.express4({
   partialsDir: path.join(app.get('views'), 'partials')
 }))
 
+// 定制一个判断是否相等的 helper
+hbs.registerHelper('equal', function (a, b, opts) {
+  return a === b ? opts.fn() : opts.inverse()
+  // opts.fn 执行结果是 else 之前的内容
+  // opts.inverse 执行结果是 else 之后的内容
+  // console.log(opts.inverse())
+  // return a + b
+  // https://github.com/helpers/handlebars-helpers
+})
+
 // 载入所需的中间件
 
 // 请求日志
