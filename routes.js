@@ -18,6 +18,7 @@ router.get('/account/login', accountController.login)
 router.post('/account/login', accountController.loginPost)
 router.get('/account/register', accountController.register)
 router.post('/account/register', accountController.registerPost)
+router.get('/account/logout', accountController.logout)
 router.get('/account/active', auth, accountController.active)
 
 router.get('/member', auth, memberController.index)

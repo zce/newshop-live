@@ -11,10 +11,14 @@ module.exports = (req, res, next) => {
   // 1. 判断 session 中有没有 currentUser
   if (req.session.currentUser) return next()
     
+  // 由于登录页登录完成过后需要调回当前正在访问的页面
+  // 所以必须在这里将当前访问地址传递给 登录页
+  const currentHref = req.originalUrl
+  
   // 2. 判断 cookie 中有没有记住我的信息
   if (!req.cookies.last_logged_in_user) {
     // 一定是未登录
-    return res.redirect('/account/login')
+    return res.redirect('/account/login?redirect=' + currentHref)
   }
   
   // 如果有 尝试使用 记住我的信息去自动登录
@@ -39,6 +43,6 @@ module.exports = (req, res, next) => {
     .catch(e => {
       // 记住我的信息登录失败
       res.clearCookie('last_logged_in_user')
-      res.redirect('/account/login')
+      res.redirect('/account/login?redirect=' + currentHref)
     })
 }

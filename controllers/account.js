@@ -10,6 +10,10 @@ const utils = require('../utils')
 
 // GET /account/login
 exports.login = (req, res) => {
+  // 将跳转带过来的参数放到表单的 action 上
+  // 让下一次 post 请求也可取到
+  res.locals.redirect = req.query.redirect
+  
   res.render('login')
 }
 
@@ -18,6 +22,7 @@ exports.loginPost = (req, res) => {
   const { username, password, captcha, remember } = req.body
 
   res.locals.username = username
+  res.locals.redirect = req.query.redirect
 
   // 1. 校验
   if (!(username && password && captcha)) {
@@ -29,8 +34,7 @@ exports.loginPost = (req, res) => {
   // 删除之前的验证码
   delete req.session.captcha
 
-  // TODO: 验证码校验
-  if (captcha.toLowerCase() !== sessionCaptcha.toLowerCase()) {
+  if (!sessionCaptcha || captcha.toLowerCase() !== sessionCaptcha.toLowerCase()) {
     return res.render('login', { msg: '验证码不正确' })
   }
 
@@ -79,7 +83,7 @@ exports.loginPost = (req, res) => {
       }
 
       // 3. 响应
-      res.redirect('/member')
+      res.redirect(req.query.redirect || '/member')
     })
     .catch(e => {
       // 如果出现异常再次显示登录页并展示错误消息
@@ -150,6 +154,13 @@ exports.registerPost = (req, res) => {
     .catch(e => {
       res.render('register', { msg: e.message })
     })
+}
+
+// GET /account/logout
+exports.logout = (req, res) => {
+  delete req.session.currentUser
+  res.clearCookie('last_logged_in_user')
+  res.redirect('/account/login')
 }
 
 // GET /account/active
