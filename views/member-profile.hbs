@@ -24,7 +24,7 @@
           <label for="avatar" class="control-label">头像：</label>
           <div class="controls">
             <label class="avatar-box">
-              <img src="/uploads/avatar/{{user_id}}.png" width="80">
+              <img src="/uploads/avatar-{{user_id}}.png" width="80">
               <input type="file" id="avatar" name="avatar">
             </label>
           </div>
@@ -84,6 +84,7 @@
           <label class="control-label">&nbsp;</label>
           <div class="controls">
             <button type="submit" class="sui-btn btn-primary btn-xlarge">保存</button>
+            {{#if msg}}<p>{{msg}}</p>{{/if}}
           </div>
         </div>
       </form>
@@ -96,4 +97,37 @@
 <script src="/assets/js/sui.carousel.js"></script>
 <script src="/assets/js/sui.tab.js"></script>
 <script src="/assets/js/sui.transition.js"></script>
+<script>
+  $(function ($) {
+    // dataUri data:<mimetype>[; charset], <content>
+    $('#avatar').on('change', function () {
+      // var $this = $(this)
+      // // 将用户选择的图片显示出来
+      // // 判断当前文件域有没有选中文件
+      // // attr 是文档属性
+      // // prop 是访问dom属性
+      // if (!$this.prop('files')[0]) return
+      // var file = $this.prop('files')[0]
+      // 
+      // var reader = new FileReader()
+      // reader.readAsDataURL(file)
+      // 
+      // reader.onload = function () {
+      //   $this.prev().fadeOut(function () {
+      //     $(this).attr('src', reader.result).fadeIn()
+      //   })
+      // }
+      
+      // Object URL
+      // 是一种页面级别给媒体对象分配的临时 URL 生命周期到 DOM 销毁为止或者手动吊销
+      var $this = $(this)
+      if (!$this.prop('files')[0]) return
+      var file = $this.prop('files')[0]
+      var url = URL.createObjectURL(file)
+      $this.prev().fadeOut(function () {
+        $(this).attr('src', url).fadeIn()
+      })
+    })
+  })
+</script>
 {{/contentFor}}
