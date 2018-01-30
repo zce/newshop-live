@@ -1,5 +1,7 @@
 const { Router } = require('express')
 
+const auth = require('./middlewares/auth')
+
 const homeController = require('./controllers/home')
 const accountController = require('./controllers/account')
 const commonController = require('./controllers/common')
@@ -16,9 +18,12 @@ router.get('/account/login', accountController.login)
 router.post('/account/login', accountController.loginPost)
 router.get('/account/register', accountController.register)
 router.post('/account/register', accountController.registerPost)
-router.get('/account/active', accountController.active)
+router.get('/account/active', auth, accountController.active)
 
-router.get('/member', memberController.index)
+router.get('/member', auth, memberController.index)
+router.get('/member/profile', auth, memberController.profile)
+router.get('/member/address', auth, memberController.address)
+router.get('/member/order', auth, memberController.order)
 
 router.get('/captcha', commonController.captcha)
 

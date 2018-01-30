@@ -5,29 +5,17 @@
 const { User } = require('../models')
 
 exports.index = (req, res) => {
-  if (!req.session.currentUser) {
-    // 此时是没有登录的状态
-    // 但是 可能 cookie 中有用户登录信息
-    if (!req.cookies.last_logged_in_user) {
-      return res.redirect('/account/login')
-    }
+  res.render('member')
+}
 
-    const { uid, pwd } = req.cookies.last_logged_in_user
+exports.profile = (req, res) => {
+  res.render('member-profile')
+}
 
-    User.findOne({ where: { user_id: uid } })
-      .then(user => {
-        // user => 根据cookie中的用户信息找到的用户对象
-        if (!user) throw new Error()
-        if (user.password !== pwd) throw new Error()
-        // cookie 登录成功
-        req.session.currentUser = user
-        res.send(req.session.currentUser.username)
-      })
-      .catch(e => {
-        // cookie 登录失败
-        res.clearCookie('last_logged_in_user')
-        res.redirect('/account/login')
-      })
-  }
-  res.send(req.session.currentUser.username)
+exports.address = (req, res) => {
+  res.render('member-address')
+}
+
+exports.order = (req, res) => {
+  res.render('member-order')
 }
