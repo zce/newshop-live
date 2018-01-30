@@ -74,7 +74,8 @@ exports.loginPost = (req, res) => {
         // cookie 的名称最好无任何意义
         const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
         // 可以使用可逆加密存储信息
-        res.cookie('last_logged_in_user', { uid: currentUser.user_id, pwd: currentUser.password }, { expires })
+        // 这个 cookie 一定是设置为 httpOnly （只能在请求响应的时候由服务端设置，不能在客户端由JS设置）
+        res.cookie('last_logged_in_user', { uid: currentUser.user_id, pwd: currentUser.password }, { expires: expires, httpOnly: true })
       }
 
       // 3. 响应
@@ -123,10 +124,13 @@ exports.registerPost = (req, res) => {
     })
     .then(user => {
       if (user) throw new Error('邮箱已经存在')
+      
+      // 可以注册
       // 2. 持久化
       const newUser = new User()
       newUser.username = username
       newUser.user_email = email
+      // 提前给用户准备一个只属于他的激活码
       newUser.user_email_code = uuid().substr(0, 12)
       const salt = bcrypt.genSaltSync(10)
       newUser.password = bcrypt.hashSync(password, salt)
@@ -151,8 +155,13 @@ exports.registerPost = (req, res) => {
 // GET /account/active
 exports.active = (req, res, next) => {
   const { code } = req.query
+  
+  if (!code) {
+    const err = new Error('Not Found')
+    err.status = 404
+    return next(err)
+  }
 
-  // TODO: 实现登录过后 再考虑如何激活用户邮箱问题 code 根谁对比
   User.findOne({ where: { user_email_code: code } })
     .then(user => {
       // 已经取到当前这个验证码匹配的用户，当前登录的用户信息在 Session 中
@@ -170,9 +179,17 @@ exports.active = (req, res, next) => {
       user.user_email_code = ''
 
       // 再次保存当前用户信息（更新数据）
+      // save 内部自动判断是否有ID 从而决定更新还是新加
       return user.save()
     })
     .then(user => {
       res.redirect('/member')
     })
 }
+
+/**
+ * 1. 用户填写邮箱表单
+2. 网站接受邮箱，并向这个邮箱发送一个唯一的链接地址
+3. 如果用户可以点击这个链接，及证明邮箱是存在但是不能证明邮箱是属于当前注册用户的
+4. 在这激活链接被请求时，网站应该要去用户登录，并且根据用户的登录信息与验证码查询出来的用户信息对比
+ */

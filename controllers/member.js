@@ -8,7 +8,6 @@ exports.index = (req, res) => {
   if (!req.session.currentUser) {
     // 此时是没有登录的状态
     // 但是 可能 cookie 中有用户登录信息
-    // console.log(req.cookies.last_logged_in_user.uid)
     if (!req.cookies.last_logged_in_user) {
       return res.redirect('/account/login')
     }
