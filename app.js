@@ -26,7 +26,9 @@ app.set('view engine', 'hbs')
 app.set('views', path.join(__dirname, 'views'))
 
 // 配置 hbs 模板文件的模板引擎
-app.engine('hbs', hbs.express4())
+app.engine('hbs', hbs.express4({
+  partialsDir: path.join(app.get('views'), 'partials')
+}))
 
 // 载入所需的中间件
 

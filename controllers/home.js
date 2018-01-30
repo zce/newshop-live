@@ -1,6 +1,6 @@
 
 exports.index = (req, res) => {
-  res.send('我是CTO，你是来面试前端的')
+  res.render('index')
 }
 
 exports.list = (req, res) => {

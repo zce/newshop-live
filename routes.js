@@ -10,6 +10,9 @@ const memberController = require('./controllers/member')
 // 创建路由对象
 const router = new Router()
 
+// 公共的中间件
+router.use(auth.resolve)
+
 router.get('/', homeController.index)
 router.get('/list', homeController.list)
 router.get('/item', homeController.item)
@@ -19,12 +22,12 @@ router.post('/account/login', accountController.loginPost)
 router.get('/account/register', accountController.register)
 router.post('/account/register', accountController.registerPost)
 router.get('/account/logout', accountController.logout)
-router.get('/account/active', auth, accountController.active)
+router.get('/account/active', auth.required, accountController.active)
 
-router.get('/member', auth, memberController.index)
-router.get('/member/profile', auth, memberController.profile)
-router.get('/member/address', auth, memberController.address)
-router.get('/member/order', auth, memberController.order)
+router.get('/member', auth.required, memberController.index)
+router.get('/member/profile', auth.required, memberController.profile)
+router.get('/member/address', auth.required, memberController.address)
+router.get('/member/order', auth.required, memberController.order)
 
 router.get('/captcha', commonController.captcha)
 
