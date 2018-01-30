@@ -45,7 +45,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 // 请求头中的 cookie 解析
 app.use(cookieParser())
 
-// 支持 Session 
+// 支持 Session
 app.use(session({ secret: 'this is a secret' }))
 
 // 挂载路由表

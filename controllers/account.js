@@ -16,27 +16,27 @@ exports.login = (req, res) => {
 // POST /account/login
 exports.loginPost = (req, res) => {
   const { username, password, captcha, remember } = req.body
-  
+
   res.locals.username = username
-  
+
   // 1. 校验
   if (!(username && password && captcha)) {
     return res.render('login', { msg: '请完整填写登录信息' })
   }
-  
+
   const sessionCaptcha = req.session.captcha
-  
+
   // 删除之前的验证码
   delete req.session.captcha
-  
+
   // TODO: 验证码校验
   if (captcha.toLowerCase() !== sessionCaptcha.toLowerCase()) {
     return res.render('login', { msg: '验证码不正确' })
   }
-  
+
   // ------------------------------------------------
   // let where = { username: username }
-  
+
   // if (username.includes('@')) {
   //   // 邮箱登录
   //   where = { user_email: username }
@@ -47,13 +47,13 @@ exports.loginPost = (req, res) => {
   // // 2. 持久化
   // User.findOne({ where })
   // ------------------------------------------------
-  
+
   const whereProp = username.includes('@') ? 'user_email' : 'username'
-  
+
   let currentUser
 
   // 2. 持久化
-  User.findOne({ where: { [whereProp] : username } })
+  User.findOne({ where: { [whereProp]: username } })
     .then(user => {
       if (!user) throw new Error('用户名或密码错误')
 
@@ -67,7 +67,7 @@ exports.loginPost = (req, res) => {
 
       // 用户名存在而且密码匹配 将当前登录用户信息存放到 session 中
       req.session.currentUser = currentUser
-      
+
       // 处理记住我
       if (remember) {
         // redirect + set cookie 把用户名和密码的密文存下来，下次自动登录
@@ -151,24 +151,24 @@ exports.registerPost = (req, res) => {
 // GET /account/active
 exports.active = (req, res, next) => {
   const { code } = req.query
-  
+
   // TODO: 实现登录过后 再考虑如何激活用户邮箱问题 code 根谁对比
   User.findOne({ where: { user_email_code: code } })
     .then(user => {
       // 已经取到当前这个验证码匹配的用户，当前登录的用户信息在 Session 中
       // 判断是否为同一个用户
       if (user.user_id !== req.session.currentUser.user_id) {
-        // 404 
+        // 404
         const err = new Error('Not Found')
         err.status = 404
         return next(err)
       }
-      
+
       // 邮箱就是当前登录用户的
       user.is_active = '是'
       // 已经激活成功了，没必要再保存 code
       user.user_email_code = ''
-      
+
       // 再次保存当前用户信息（更新数据）
       return user.save()
     })

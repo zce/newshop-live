@@ -3,7 +3,7 @@
  */
 
 const { User } = require('../models')
- 
+
 exports.index = (req, res) => {
   if (!req.session.currentUser) {
     // 此时是没有登录的状态
@@ -12,9 +12,9 @@ exports.index = (req, res) => {
     if (!req.cookies.last_logged_in_user) {
       return res.redirect('/account/login')
     }
-    
+
     const { uid, pwd } = req.cookies.last_logged_in_user
-    
+
     User.findOne({ where: { user_id: uid } })
       .then(user => {
         // user => 根据cookie中的用户信息找到的用户对象

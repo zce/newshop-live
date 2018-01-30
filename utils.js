@@ -2,7 +2,7 @@ const nodemailer = require('nodemailer')
 
 // const transporter = nodemailer.createTransport({
 //   // 发送邮件用 smtp 收 pop imap
-//   host: 'smtp.qq.com', 
+//   host: 'smtp.qq.com',
 //   // 默认端口号 25  如果使用 ssl 端口是 465 或者 587
 //   port: 465,
 //   // 是否使用 ssl
@@ -31,6 +31,6 @@ exports.sendEmail = (to, subject, content) => {
     subject: subject,
     html: content
   }
-  
+
   return transporter.sendMail(message)
 }
