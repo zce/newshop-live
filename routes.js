@@ -13,10 +13,13 @@ const router = new Router()
 
 // 公共的中间件
 router.use(auth.resolve)
-router.use(categories)
+
+// // 使用中间件的方式载入分类数据
+// router.use(categories)
 
 router.get('/', homeController.index)
-router.get('/list', homeController.list)
+// 需要注意转义的问题
+router.get('/list/:cat_id(\\d+)', homeController.list)
 router.get('/item', homeController.item)
 
 router.get('/account/login', accountController.login)
@@ -34,6 +37,8 @@ router.get('/member/address', auth.required, memberController.address)
 router.get('/member/order', auth.required, memberController.order)
 
 router.get('/captcha', commonController.captcha)
+
+router.get('/demo', homeController.demo)
 
 // 导出路由对象
 module.exports = router

@@ -13,6 +13,8 @@ const bodyParser = require('body-parser')
 const morgan = require('morgan')
 const hbs = require('express-hbs')
 
+const models = require('./models')
+
 // 载入路由表
 const routes = require('./routes')
 
@@ -34,12 +36,38 @@ app.engine('hbs', hbs.express4({
 
 // 定制一个判断是否相等的 helper
 hbs.registerHelper('equal', function (a, b, opts) {
-  return a === b ? opts.fn() : opts.inverse()
+  return a === b ? opts.fn(this) : opts.inverse(this)
   // opts.fn 执行结果是 else 之前的内容
   // opts.inverse 执行结果是 else 之后的内容
   // console.log(opts.inverse())
   // return a + b
   // https://github.com/helpers/handlebars-helpers
+})
+
+hbs.registerHelper('foo', function (opts) {
+  // 如果你是开闭标签的方式 一般会用到 opts.fn 和 opts.inverse
+  // 如果是单标签的方式使用 一般是 return 一个字符串
+  // fn 或者 inverse 的参数就是这对标签中间的数据作用域
+  // 这个函数中的 this 就是全局数据成员
+  return opts.fn(this)
+})
+
+hbs.registerAsyncHelper('categories', function (opts, callback) {
+  // 查询到全部分类数据并递归成为一个树状结构
+  models.Category.findAll({ where: { cat_deleted: 0 } })
+    .then(categories => {
+      function foo (pid) {
+        return categories
+          .filter(s => s.cat_pid === pid)
+          .map(c => {
+            c.children = foo(c.cat_id)
+            return c
+          })
+      }
+      
+      const result = opts.fn({ categories: foo(0) })
+      callback(result)
+    })
 })
 
 // 载入所需的中间件

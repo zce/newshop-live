@@ -91,17 +91,18 @@
               </div>
               <div class="sort">
                 <div class="all-sort-list2">
+                  {{#categories}}
                   {{#each categories}}
                   <div class="item">
-                    <h3><a href="/list/1">{{cat_name}}</a></h3>
+                    <h3><a href="/list/{{cat_id}}">{{cat_name}}</a></h3>
                     <div class="item-list clearfix">
                       <div class="subitem">
                         {{#each children}}
                         <dl>
-                          <dt><a href="/list/1">{{cat_name}}</a></dt>
+                          <dt><a href="/list/{{cat_id}}">{{cat_name}}</a></dt>
                           <dd>
                             {{#each children}}
-                            <em><a href="/list/1">{{cat_name}}</a></em>
+                            <em><a href="/list/{{cat_id}}">{{cat_name}}</a></em>
                             {{/each}}
                           </dd>
                         </dl>
@@ -110,6 +111,7 @@
                     </div>
                   </div>
                   {{/each}}
+                  {{/categories}}
                 </div>
               </div>
             </div>
