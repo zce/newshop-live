@@ -44,6 +44,7 @@ hbs.registerHelper('equal', function (a, b, opts) {
   // https://github.com/helpers/handlebars-helpers
 })
 
+// 测试 helper
 hbs.registerHelper('foo', function (opts) {
   // 如果你是开闭标签的方式 一般会用到 opts.fn 和 opts.inverse
   // 如果是单标签的方式使用 一般是 return 一个字符串
@@ -57,6 +58,7 @@ hbs.registerAsyncHelper('categories', function (opts, callback) {
   models.Category.findAll({ where: { cat_deleted: 0 } })
     .then(categories => {
       function foo (pid) {
+        // 找到所有指定 pid 的分类 并为它们分别找到它们的子分类
         return categories
           .filter(s => s.cat_pid === pid)
           .map(c => {
@@ -88,7 +90,7 @@ app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 
 // 支持 Session
-app.use(session({ secret: 'this is a secret' }))
+app.use(session({ secret: 'this is a secret', resave: false, saveUninitialized: false }))
 
 // 挂载路由表
 app.use(routes)
