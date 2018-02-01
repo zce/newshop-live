@@ -2,7 +2,7 @@
  * 前台页面控制器
  */
 
-const { Category, Goods } = require('../models')
+const { Category, Goods, GoodsPics } = require('../models')
  
 exports.index = (req, res) => {
   res.render('index')
@@ -68,8 +68,40 @@ exports.list = (req, res, next) => {
   //   .catch(next)
 }
 
-exports.item = (req, res) => {
-  res.send('我是CTO，你是来面试后端的')
+exports.item = (req, res, next) => {
+  const { goods_id } = req.params
+  
+  Goods.findOne({ where: { goods_id } })
+    .then(goods => {
+      // goods => 如果有这个 商品 拿到商品信息，反之 null
+      if (!goods) throw new Error('这个商品不存在')
+      
+      // 挂载到 locals 中
+      res.locals.goods = goods
+      
+      // 商品图片
+      return GoodsPics.findAll({ where: { goods_id } })
+    })
+    .then(images => {
+      res.locals.images = images
+      return Category.findOne({ where: { cat_id: res.locals.goods.cat_one_id } })
+    })
+    .then(oneCategory => {
+      res.locals.oneCategory = oneCategory
+      return Category.findOne({ where: { cat_id: res.locals.goods.cat_two_id } })
+    })
+    .then(twoCategory => {
+      res.locals.twoCategory = twoCategory
+      return Category.findOne({ where: { cat_id: res.locals.goods.cat_three_id } })
+    })
+    .then(threeCategory => {
+      res.locals.threeCategory = threeCategory
+      res.render('item')
+    })
+    .catch(e => {
+      e.status = 404
+      next(e)
+    })
 }
 
 exports.demo = (req, res) =>{

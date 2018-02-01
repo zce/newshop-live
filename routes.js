@@ -20,7 +20,7 @@ router.use(auth.resolve)
 router.get('/', homeController.index)
 // 需要注意转义的问题
 router.get('/list/:cat_id(\\d+)', homeController.list)
-router.get('/item', homeController.item)
+router.get('/item/:goods_id(\\d+)', homeController.item)
 
 router.get('/account/login', accountController.login)
 router.post('/account/login', accountController.loginPost)
