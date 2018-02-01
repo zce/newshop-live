@@ -1,4 +1,7 @@
-
+/**
+ * 前台页面控制器
+ */
+ 
 exports.index = (req, res) => {
   res.render('index')
 }

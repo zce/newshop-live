@@ -27,6 +27,8 @@ app.set('views', path.join(__dirname, 'views'))
 
 // 配置 hbs 模板文件的模板引擎
 app.engine('hbs', hbs.express4({
+  // 指定部分页（被载入的模板）所存在的目录
+  // {{> member-sidebar}}
   partialsDir: path.join(app.get('views'), 'partials')
 }))
 
