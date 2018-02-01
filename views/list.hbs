@@ -9,7 +9,7 @@
     <!--bread-->
     <div class="bread">
       <ul class="fl sui-breadcrumb">
-        <li class="active">智能手机</li>
+        <li class="active">{{totalPages}}</li>
       </ul>
     </div>
     <!--selector-->
@@ -45,11 +45,11 @@
       <div class="sui-navbar">
         <div class="navbar-inner filter">
           <ul class="sui-nav">
-            <li class="active"><a href="#">综合</a></li>
-            <li><a href="#">销量</a></li>
+            <li{{#equal sort 'upd_time'}} class="active"{{/equal}}><a href="?">综合</a></li>
+            <li><a href="?">销量</a></li>
             <li><a href="#">新品</a></li>
             <li><a href="#">评价</a></li>
-            <li><a href="#">价格</a></li>
+            <li{{#equal sort 'goods_price'}} class="active"{{/equal}}><a href="?sort=goods_price">价格</a></li>
           </ul>
         </div>
       </div>
@@ -71,22 +71,7 @@
         </ul>
       </div>
       <div class="fr page">
-        <div class="sui-pagination pagination-large">
-          <ul>
-            <li class="prev disabled"><a href="#">«上一页</a></li>
-            <li class="active"><a href="#">1</a></li>
-            <li><a href="#">2</a></li>
-            <li><a href="#">3</a></li>
-            <li><a href="#">4</a></li>
-            <li><a href="#">5</a></li>
-            <li class="dotted"><span>...</span></li>
-            <li class="next"><a href="#">下一页»</a></li>
-          </ul>
-          <div>
-            <span>共10页</span>
-            <span>到第 <input type="text" class="page-num"> 页 <button class="page-confirm">确定</button></span>
-          </div>
-        </div>
+        {{pagination page totalPages}}
       </div>
     </div>
   </div>

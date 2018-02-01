@@ -3,6 +3,7 @@
  */
 
 // 内置模块依赖
+const url = require('url')
 const path = require('path')
 
 // 载入第三方依赖模块
@@ -53,6 +54,89 @@ hbs.registerHelper('foo', function (opts) {
   return opts.fn(this)
 })
 
+// 分页页码 helper
+hbs.registerHelper('pagination', function (current, total, opts) {
+  const urlObj = url.parse(this.originalUrl, true)
+  
+  // 获取当前访问链接
+  // 1. 通过获取此次访问的页面链接
+  // 2. 解析这个链接，替换掉分页参数，其他保持不变
+  function getPageLink (page) {
+    urlObj.query.page = page
+    delete urlObj.search // !!!
+    return url.format(urlObj)
+  }
+  
+  // 根据传过来的参数生成分页页码 HTML
+  const visibles = 5
+  const region = Math.floor(visibles / 2)
+  
+  let begin = current - region
+  begin = begin < 1 ? 1 : begin
+  
+  let end = begin + visibles - 1
+  end = end > total ? total : end
+  
+  // end 重新赋值过后可能导致 begin 不对称
+  begin = end - visibles + 1
+  begin = begin < 1 ? 1 : begin
+  
+  let result = '<div class="sui-pagination pagination-large"><ul>'
+  
+  if (current > 1) {
+    result += `<li class="prev"><a href="${getPageLink(current - 1)}">« 上一页</a></li>`
+  }
+  
+  if (begin > 1) {
+    result += `<li class="dotted"><span>...</span></li>`
+  }
+  
+  for (let i = begin; i <= end; i++) {
+    // 当前页高亮
+    const activeClass = i === current ? ' class="active"' : ''
+    
+    result += `<li${activeClass}><a href="${getPageLink(i)}">${i}</a></li>`
+  }
+  
+  if (end < total) {
+    result += `<li class="dotted"><span>...</span></li>`
+  }
+  
+  if (current < total) {
+    result += `<li class="next"><a href="${getPageLink(current + 1)}">下一页»</a></li>`
+  }
+  
+  result += `</ul>
+  <div>
+    <span>共${total}页</span>
+    <form>到第 <input type="text" name="page" class="page-num"> 页 <button class="page-confirm">确定</button></form>
+  </div>
+</div>`
+
+  // SafeString 可以让 {{}} 正常输出 HTML
+  return new hbs.SafeString(result)
+  
+  /**
+   * <div class="sui-pagination pagination-large">
+          <ul>
+            <li class="prev disabled"><a href="#">«上一页</a></li>
+            <li class="active"><a href="#">1</a></li>
+            <li><a href="#">2</a></li>
+            <li><a href="#">3</a></li>
+            <li><a href="#">4</a></li>
+            <li><a href="#">5</a></li>
+            <li class="dotted"><span>...</span></li>
+            <li class="next"><a href="#">下一页»</a></li>
+          </ul>
+          <div>
+            <span>共10页</span>
+            <span>到第 <input type="text" class="page-num"> 页 <button class="page-confirm">确定</button></span>
+          </div>
+        </div>
+   */
+})
+
+// 获取分类数据 helper
 hbs.registerAsyncHelper('categories', function (opts, callback) {
   // 查询到全部分类数据并递归成为一个树状结构
   models.Category.findAll({ where: { cat_deleted: 0 } })
