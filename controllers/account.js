@@ -7,6 +7,7 @@ const bcrypt = require('bcryptjs')
 
 const { User, UserCart } = require('../models')
 const utils = require('../utils')
+const carts = require('../middlewares/carts')
 
 /**
  * 将 cookie 中的购物车信息合并到数据库中（如果有的话）
@@ -137,9 +138,11 @@ exports.loginPost = (req, res) => {
     .then(() => {
       res.clearCookie('cart_list')
       delete req.cookies.cart_list
-      
-      // 3. 响应
-      res.redirect(req.query.redirect || '/member')
+      // 再次同步界面上的购物车信息
+      carts(req, res, () => {
+        // 3. 响应
+        res.redirect(req.query.redirect || '/member')
+      })
     })
     .catch(e => {
       // 如果出现异常再次显示登录页并展示错误消息

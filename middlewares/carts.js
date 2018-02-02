@@ -58,10 +58,11 @@ module.exports = (req, res, next) => {
       return Promise.all(promises)
     })
     .then(cartList => {
+      // 每一个商品信息都查询完成过后 才执行这里
       res.locals.cartList = cartList
       
-      // res.locals.cartTotalPrice = cartList.map(i => parseFloat(i.total)).reduce((prev, next) => prev + next)
-      // res.locals.cartTotalCount = cartList.map(i => i.amount).reduce((prev, next) => prev + next)
+      res.locals.cartTotalPrice = cartList.reduce((prev, next) => parseFloat(prev) + parseFloat(next.price), 0)
+      res.locals.cartTotalCount = cartList.reduce((prev, next) => prev + next.amount, 0)
       
       next()
     })

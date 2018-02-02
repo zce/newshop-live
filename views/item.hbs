@@ -69,15 +69,16 @@
               </dd>
             </dl>
           </div>
-
-          <div class="summary-wrap">
+          
+          <form action="/cart/add" method="get" class="summary-wrap">
+            <input type="hidden" name="goods_id" value="{{goods.goods_id}}">
             <div class="controls">
-              <input autocomplete="off" type="text" value="1" minnum="1" class="itxt">
+              <input name="amount" autocomplete="off" type="text" value="1" minnum="1" class="itxt">
               <a href="#" class="increment plus">+</a>
               <a href="#" class="increment mins">-</a>
             </div>
-            <a href="/cart/add?goods_id={{goods.goods_id}}" class="sui-btn  btn-danger addshopcar">加入购物车</a>
-          </div>
+            <button class="sui-btn  btn-danger addshopcar">加入购物车</button>
+          </form>
         </div>
       </div>
     </div>

@@ -34,8 +34,9 @@ exports.index = (req, res, next) => {
 
 // GET /cart/add?goods_id=123
 exports.add = (req, res, next) => {
-  let { goods_id } = req.query
+  let { goods_id, amount = 1 } = req.query
   goods_id = ~~goods_id
+  amount = ~~amount
   
   if (!goods_id) {
     // 必须接收 商品 ID
@@ -66,10 +67,10 @@ exports.add = (req, res, next) => {
 
       if (exists) {
         // 之前已经存在于购物车中
-        exists.amount ++
+        exists.amount += amount
       } else {
         // 之前没有
-        cartList.push({ id: goods_id, amount: 1 })
+        cartList.push({ id: goods_id, amount: amount })
       }
       
       // 没登录就是 cookie
