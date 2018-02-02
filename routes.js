@@ -1,7 +1,7 @@
 const { Router } = require('express')
 
 const auth = require('./middlewares/auth')
-const categories = require('./middlewares/categories')
+const carts = require('./middlewares/carts')
 
 const homeController = require('./controllers/home')
 const accountController = require('./controllers/account')
@@ -17,6 +17,8 @@ router.use(auth.resolve)
 
 // // 使用中间件的方式载入分类数据
 // router.use(categories)
+// 获取当前购物车信息
+router.use(carts)
 
 router.get('/', homeController.index)
 // 需要注意转义的问题
@@ -40,6 +42,7 @@ router.get('/member/order', auth.required, memberController.order)
 router.get('/captcha', commonController.captcha)
 
 // 购物车路由
+router.get('/cart', cartController.index)
 router.get('/cart/add', cartController.add)
 
 router.get('/demo', homeController.demo)
