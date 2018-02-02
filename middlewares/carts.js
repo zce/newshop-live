@@ -38,11 +38,17 @@ module.exports = (req, res, next) => {
         return Goods.findOne({ where: { goods_id: c.id } })
           .then(goods => {
             // c => { id: 853, amount: 5 }
-            c.name = goods.goods_name
-            c.image = goods.goods_small_logo
-            c.price = goods.goods_price
-            c.total = (c.price * c.amount).toFixed(2)
-            return c
+            return Object.assign({
+              name: goods.goods_name,
+              image: goods.goods_small_logo,
+              price: goods.goods_price,
+              total: (goods.goods_price * c.amount).toFixed(2)
+            }, c)
+            // c.name = goods.goods_name
+            // c.image = goods.goods_small_logo
+            // c.price = goods.goods_price
+            // c.total = (c.price * c.amount).toFixed(2)
+            // return c
           })
       })
       // promises => [ Promise, Promise, Promise ]
@@ -54,8 +60,8 @@ module.exports = (req, res, next) => {
     .then(cartList => {
       res.locals.cartList = cartList
       
-      res.locals.cartTotalPrice = cartList.map(i => parseFloat(i.total)).reduce((prev, next) => prev + next)
-      res.locals.cartTotalCount = cartList.map(i => i.amount).reduce((prev, next) => prev + next)
+      // res.locals.cartTotalPrice = cartList.map(i => parseFloat(i.total)).reduce((prev, next) => prev + next)
+      // res.locals.cartTotalCount = cartList.map(i => i.amount).reduce((prev, next) => prev + next)
       
       next()
     })

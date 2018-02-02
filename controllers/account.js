@@ -5,8 +5,57 @@
 const uuid = require('uuid')
 const bcrypt = require('bcryptjs')
 
-const { User } = require('../models')
+const { User, UserCart } = require('../models')
 const utils = require('../utils')
+
+/**
+ * 将 cookie 中的购物车信息合并到数据库中（如果有的话）
+ */
+function syncCart (req) {
+  // 1. 读取 cookie 购物车的信息
+  const cookieCartList = req.cookies.cart_list || []
+  if (!cookieCartList.length) {
+    // 没有离线购物车信息，直接结束该业务
+    return false
+  }
+  
+  // 2. 合并到数据库中已有的购物车信息
+  UserCart.findOrCreate({ 
+    where: { user_id: req.session.currentUser.user_id },
+    defaults: {
+      user_id: req.session.currentUser.user_id,
+      cart_info: '[]',
+      created_at: Date.now() / 1000,
+      updated_at: Date.now() / 1000
+    }
+  })
+  .then(([ cart, created ]) => {
+    let dbCartList
+    try {
+      dbCartList = JSON.parse(cart.cart_info)
+    } catch (e) {
+      dbCartList = []
+    }
+    
+    // cookieCartList => dbCartList
+    cookieCartList.forEach(c => {
+      // c 在数据库是否存在
+      const exists = dbCartList.find(d => d.id === c.id)
+      if (exists) {
+        exists.amount += c.amount
+      } else {
+        dbCartList.push(c)
+      }
+    })
+    
+    // dbCartList => 合并过后的结果
+    cart.cart_info = JSON.stringify(dbCartList)
+    
+    // 3. 将合并的结果再次存回数据库
+    return cart.save()
+  })
+  // TODO: 4. 重新获取购物车数据（包括价格名称。。）
+}
 
 // GET /account/login
 exports.login = (req, res) => {
@@ -81,13 +130,20 @@ exports.loginPost = (req, res) => {
         // 这个 cookie 一定是设置为 httpOnly （只能在请求响应的时候由服务端设置，不能在客户端由JS设置）
         res.cookie('last_logged_in_user', { uid: currentUser.user_id, pwd: currentUser.password }, { expires: expires, httpOnly: true })
       }
-
+      
+      // 同步购物车
+      return syncCart(req)
+    })
+    .then(() => {
+      res.clearCookie('cart_list')
+      delete req.cookies.cart_list
+      
       // 3. 响应
       res.redirect(req.query.redirect || '/member')
     })
     .catch(e => {
       // 如果出现异常再次显示登录页并展示错误消息
-      return res.render('login', { msg: e.message })
+      res.render('login', { msg: e.message })
     })
 }
 
