@@ -63,4 +63,101 @@
   + 列表页数据加载
   + 分页 & 排序
   + 详细页数据展示
+  
+## day-05
+
+- 回顾 & 问题
+  + 递归加载分类数据
+  + 自定义 helper 问题
+  
 - 加入购物车
+  + 离线购物车
+  
+- 购物车列表
+
+
+
+
+- forEach
+  仅仅是遍历
+- map
+  在 forEach 基础之上 将每一个函数调用的返回值装到一个新的数组中返回
+- filter
+  返回全部满足条件成员（新的数组）
+- find
+  只返回第一个满足条件的成员
+- every
+  可以跳出循环，return false
+- some
+  可以跳出循环，return true
+
+
+模块化
+  当业务越来越复杂或者越来越完善，与之对应的就是代码量的提升
+  CommonJS 
+  AMD http://www.requirejs.org/
+  CMD
+  
+  UMD = CommonJS + AMD
+  
+  Webpack 最早就是一个模块打包工具
+
+
+[
+  { id: 1, name: 'zhangsan', pid: 0 },
+  { id: 2, name: 'lisi', pid: 0 },
+  { id: 3, name: 'wanger', pid: 0 },
+  { id: 4, name: 'wqeqwe', pid: 1 },
+  { id: 5, name: 'asdsa', pid: 4 }
+]
+
+递归 ↓
+
+[
+  { 
+    id: 1, 
+    name: 'zhangsan', 
+    pid: 0,
+    children: [
+      { 
+        id: 4, 
+        name: 'wqeqwe', 
+        pid: 1,
+        children: [ 
+          { id: 5, name: 'asdsa', pid: 4 }
+        ]
+      }
+    ]
+  },
+  { id: 2, name: 'lisi', pid: 0 },
+  { id: 3, name: 'wanger', pid: 0 }
+]
+
+
+const categories = [ ... ]
+
+const top = categories.filter(c => c.pid === 0)
+
+top.forEach(t => {
+  t.children = categories.filter(c => c.pid === t.id)
+  
+  t.children.forEach(s => {
+    s.children = categories.filter(c => c.pid === s.id)
+  })
+})
+
+
+
+不管是 面向对象 MVC MVVM MVP 都是让每一个成员各司其职，便于维护和管理
+
+MVVM 比较适合做客户端软件 （网页程序）
+
+
+gppongmhjkpfnbhagpmjfkannfbllamg
+
+
+Webpack 可以打包 commonjs 和 es6
+
+rollup es6 模块
+
+broccoli 类似于 gulp

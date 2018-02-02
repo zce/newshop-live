@@ -7,6 +7,7 @@ const homeController = require('./controllers/home')
 const accountController = require('./controllers/account')
 const commonController = require('./controllers/common')
 const memberController = require('./controllers/member')
+const cartController = require('./controllers/cart')
 
 // 创建路由对象
 const router = new Router()
@@ -37,6 +38,9 @@ router.get('/member/address', auth.required, memberController.address)
 router.get('/member/order', auth.required, memberController.order)
 
 router.get('/captcha', commonController.captcha)
+
+// 购物车路由
+router.get('/cart/add', cartController.add)
 
 router.get('/demo', homeController.demo)
 
