@@ -50,6 +50,7 @@ router.get('/cart/add', cartController.add)
 // 结算
 router.get('/checkout', auth.required, checkoutController.index)
 router.post('/checkout/create', auth.required, checkoutController.create)
+router.get('/checkout/pay', auth.required, checkoutController.pay)
 
 // 测试
 router.get('/demo', homeController.demo)

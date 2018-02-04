@@ -127,26 +127,82 @@ exports.index = (req, res, next) => {
 }
 
 
-  // // 1. 获取到需要添加到订单中的商品信息
-  // // 只需要取数据库中属于当前用户的购物车信息
-  // UserCart.findOne({ where: { user_id: req.session.currentUser.user_id } })
-  //   .then(cart => {
-  //     if (!cart) throw new Error('没有购物车记录')
+// ===============================================================
+const path = require('path')
+const Alipay = require('alipay-node-sdk')
 
-  //     // 一旦解析 JSON 失败 都会执行最后的 catch
-  //     const cartList = JSON.parse(cart.cart_info)
-  //     //
+const alipay_gate_way = 'https://openapi.alipay.com/gateway.do'
+const alipay_gate_way_sandbox = 'https://openapi.alipaydev.com/gateway.do'
 
-  //     // 2. 创建一个新订单
-  //     return Order.create({
-  //       user_id: req.session.currentUser.user_id,
-  //       order_number: generateOrderNumer(),
-  //       order_price:
-  //     })
-  //     // 3. 再为这个订单创建多条订单商品信息
-  //     // 4. 将这些信息展现到订单的结算页面
-  //   })
-  //   .catch(e => {
-  //     e.status = 404
-  //     next(e)
-  //   })
+// 支付客户端
+const alipay = new Alipay({
+  appId: '2016081600257580',
+  // 支付成功过后 支付宝的通知地址
+  notifyUrl: 'http://localhost:3000/checkout/callback',
+  // 应用私钥
+  rsaPrivate: path.join(__dirname, '../secrets/app_private_key.pem'),
+  // 支付宝公钥
+  rsaPublic: path.join(__dirname, '../secrets/alipay_public_key.pem'),
+  // 是否是沙箱模式
+  sandbox: true,
+  signType: 'RSA2'
+})
+
+exports.pay = (req, res) => {
+  const { num } = req.query
+  
+  Promise.resolve()
+    .then(() => {
+      if (!num) throw new Error('订单不存在')
+      return Order.findOne({ where: { order_number: num } })
+    })
+    .then(order => {
+      if (!order) throw new Error('订单不存在')
+      
+      // 获取到订单需要支付的金额过后，直接调用 Alipay
+      // 将支付信息通过 支付宝 SDK 转换成查询参数
+      const params = alipay.pagePay({
+        // subject + body 是为了让用户在支付宝的支付留下信息记录
+        subject: '测试商品',
+        body: '测试商品描述',
+        outTradeId: order.order_number,
+        timeout: '10m',
+        // 需要支付的金额
+        amount: '0.01',
+        goodsType: '1',
+        qrPayMode: 0
+      })
+
+      res.redirect(`${alipay_gate_way_sandbox}?${params}`)
+    })
+}
+
+// 1 接收回调（用户发起）
+// 不可信任
+
+// 2 接收支付宝通知（支付宝服务器发起）
+// 不得不信任
+
+// // 1. 获取到需要添加到订单中的商品信息
+// // 只需要取数据库中属于当前用户的购物车信息
+// UserCart.findOne({ where: { user_id: req.session.currentUser.user_id } })
+//   .then(cart => {
+//     if (!cart) throw new Error('没有购物车记录')
+
+//     // 一旦解析 JSON 失败 都会执行最后的 catch
+//     const cartList = JSON.parse(cart.cart_info)
+//     //
+
+//     // 2. 创建一个新订单
+//     return Order.create({
+//       user_id: req.session.currentUser.user_id,
+//       order_number: generateOrderNumer(),
+//       order_price:
+//     })
+//     // 3. 再为这个订单创建多条订单商品信息
+//     // 4. 将这些信息展现到订单的结算页面
+//   })
+//   .catch(e => {
+//     e.status = 404
+//     next(e)
+//   })
