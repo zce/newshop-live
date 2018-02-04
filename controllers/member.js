@@ -5,8 +5,8 @@
 const fs = require('fs')
 const path = require('path')
 const util = require('util')
-const multer  = require('multer')
- 
+const multer = require('multer')
+
 const { User } = require('../models')
 const upload = multer({ dest: 'public/uploads/' })
 
@@ -21,7 +21,7 @@ const rename = util.promisify(fs.rename)
 //   })
 // }
 
-// // 
+// //
 // wrap(fs.rename)
 
 exports.index = (req, res) => {
@@ -41,7 +41,7 @@ exports.profilePost = [upload.single('avatar'), (req, res) => {
   const { user_sex, user_qq, user_tel, user_xueli, user_hobby, user_introduce } = req.body
   // 头像的目标位置
   const target = path.join(__dirname, `../public/uploads/avatar-${req.session.currentUser.user_id}.png`)
-  
+
   rename(path.join(__dirname, '..', req.file.path), target)
     .then(() => {
       // 移动头像成功，修改数据
@@ -63,7 +63,7 @@ exports.profilePost = [upload.single('avatar'), (req, res) => {
     .catch(e => {
       res.render('member-profile', { msg: '更新失败，请重试' })
     })
-    
+
   // fs.rename(path.join(__dirname, '..', req.file.path), target, (err) => {
   //   if (err) return res.render('member-profile', { msg: '上传头像失败' })
   //   // 移动头像成功，修改数据

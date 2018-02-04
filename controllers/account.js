@@ -19,9 +19,9 @@ function syncCart (req) {
     // 没有离线购物车信息，直接结束该业务
     return false
   }
-  
+
   // 2. 合并到数据库中已有的购物车信息
-  UserCart.findOrCreate({ 
+  UserCart.findOrCreate({
     where: { user_id: req.session.currentUser.user_id },
     defaults: {
       user_id: req.session.currentUser.user_id,
@@ -37,7 +37,7 @@ function syncCart (req) {
     } catch (e) {
       dbCartList = []
     }
-    
+
     // cookieCartList => dbCartList
     cookieCartList.forEach(c => {
       // c 在数据库是否存在
@@ -48,10 +48,10 @@ function syncCart (req) {
         dbCartList.push(c)
       }
     })
-    
+
     // dbCartList => 合并过后的结果
     cart.cart_info = JSON.stringify(dbCartList)
-    
+
     // 3. 将合并的结果再次存回数据库
     return cart.save()
   })
@@ -63,7 +63,7 @@ exports.login = (req, res) => {
   // 将跳转带过来的参数放到表单的 action 上
   // 让下一次 post 请求也可取到
   res.locals.redirect = req.query.redirect
-  
+
   res.render('login')
 }
 
@@ -131,7 +131,7 @@ exports.loginPost = (req, res) => {
         // 这个 cookie 一定是设置为 httpOnly （只能在请求响应的时候由服务端设置，不能在客户端由JS设置）
         res.cookie('last_logged_in_user', { uid: currentUser.user_id, pwd: currentUser.password }, { expires: expires, httpOnly: true })
       }
-      
+
       // 同步购物车
       return syncCart(req)
     })
@@ -187,7 +187,7 @@ exports.registerPost = (req, res) => {
     })
     .then(user => {
       if (user) throw new Error('邮箱已经存在')
-      
+
       // 可以注册
       // 2. 持久化
       const newUser = new User()
@@ -225,7 +225,7 @@ exports.logout = (req, res) => {
 // GET /account/active
 exports.active = (req, res, next) => {
   const { code } = req.query
-  
+
   if (!code) {
     const err = new Error('Not Found')
     err.status = 404

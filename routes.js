@@ -8,6 +8,7 @@ const accountController = require('./controllers/account')
 const commonController = require('./controllers/common')
 const memberController = require('./controllers/member')
 const cartController = require('./controllers/cart')
+const checkoutController = require('./controllers/checkout')
 
 // 创建路由对象
 const router = new Router()
@@ -45,6 +46,11 @@ router.get('/captcha', commonController.captcha)
 router.get('/cart', cartController.index)
 router.get('/cart/add', cartController.add)
 
+// 结算
+router.get('/checkout', auth.required, checkoutController.index)
+router.post('/checkout/create', auth.required, checkoutController.create)
+
+// 测试
 router.get('/demo', homeController.demo)
 
 // 导出路由对象

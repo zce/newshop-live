@@ -146,18 +146,30 @@ top.forEach(t => {
   })
 })
 
-
-
 不管是 面向对象 MVC MVVM MVP 都是让每一个成员各司其职，便于维护和管理
 
 MVVM 比较适合做客户端软件 （网页程序）
 
-
 gppongmhjkpfnbhagpmjfkannfbllamg
-
 
 Webpack 可以打包 commonjs 和 es6
 
 rollup es6 模块
 
 broccoli 类似于 gulp
+
+
+## day-06
+
+- 回顾
+
+- 生成订单
+
+- 我的订单列表
+
+- 订单结算
+
+
+
+模板引擎的集合
+https://github.com/tj/consolidate.js

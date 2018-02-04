@@ -35,7 +35,7 @@
                 <span>尺寸: 13.3英寸</span><br>
               </li>
               <li class="yui3-u-1-8">
-                <span class="price">{{price}}</span>
+                <span class="price">{{toFixed price}}</span>
               </li>
               <li class="yui3-u-1-8">
                 <a href="#" class="increment mins">-</a>
@@ -43,7 +43,7 @@
                 <a href="#" class="increment plus">+</a>
               </li>
               <li class="yui3-u-1-8">
-                <span class="sum">{{total}}</span>
+                <span class="sum">{{toFixed total}}</span>
               </li>
               <li class="yui3-u-1-8">
                 <a href="#none">删除</a>
@@ -58,11 +58,11 @@
       <div class="money-box">
         <div class="sumprice">
           <span><strong>1</strong> 件商品</span><br>
-          <span><em>总价（不含运费）：</em><i class="summoney">¥16283.00</i></span>
+          <span><em>总价（不含运费）：</em><i class="summoney">¥{{cartTotalPrice}}</i></span>
         </div>
-        <div class="sumbtn">
-          <a class="sum-btn" href="checkout.html">结算</a>
-        </div>
+        <form class="sumbtn" action="/checkout/create" method="post" target="_blank">
+          <button class="sum-btn">结算</button>
+        </form>
       </div>
     </div>
   </div>
