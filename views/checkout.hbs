@@ -18,20 +18,15 @@
     <div class="step-cont">
       <div class="addressInfo">
         <ul class="addr-detail">
-          <li class="addr-item selected">
-            <div class="con name"><a href="#">张默</a></div>
-            <div class="con address">张默 北京市海淀区三环内 中关村软件园9号楼 <span>159****3201</span></div>
-          </li>
+          {{#each consignee}}
           <li class="addr-item">
-            <div class="con name"><a href="#">张默</a></div>
-            <div class="con address">张默 北京市海淀区三环内 中关村软件园9号楼 <span>159****3201</span></div>
+            <div class="con name"><a href="#">{{cgn_name}}</a></div>
+            <div class="con address">{{cgn_name}} {{cgn_address}} <span>{{mobileMask cgn_tel}}</span></div>
           </li>
-          <li class="addr-item">
-            <div class="con name"><a href="#">张默</a></div>
-            <div class="con address">张默 北京市海淀区三环内 中关村软件园9号楼 <span>159****3201</span></div>
-          </li>
+          {{/each}}
         </ul>
       </div>
+      {{!-- 这里是添加地址的模态框 --}}
       <div id="add_address" class="sui-modal hide fade">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -40,36 +35,36 @@
               <h4 id="myModalLabel" class="modal-title">添加收货地址</h4>
             </div>
             <div class="modal-body">
-              <form action="" class="sui-form form-horizontal">
+              <form class="sui-form form-horizontal">
                 <div class="control-group">
                   <label class="control-label">收货人：</label>
                   <div class="controls">
-                    <input type="text" class="input-xfat">
+                    <input type="text" name="cgn_name" class="input-xfat">
                   </div>
                 </div>
                 <div class="control-group">
                   <label class="control-label">详细地址：</label>
                   <div class="controls">
-                    <input type="text" class="input-xfat input-xlarge">
+                    <input type="text" name="cgn_address" class="input-xfat input-large">
                   </div>
                 </div>
                 <div class="control-group">
                   <label class="control-label">手机：</label>
                   <div class="controls">
-                    <input type="text" class="input-xfat">
+                    <input type="text" name="cgn_tel" class="input-xfat">
                   </div>
                 </div>
                 <div class="control-group">
                   <label class="control-label">邮编：</label>
                   <div class="controls">
-                    <input type="text" class="input-xfat">
+                    <input type="text" name="cgn_code" class="input-xfat">
                   </div>
                 </div>
               </form>
             </div>
             <div class="modal-footer">
-              <button type="button" data-ok="modal" class="sui-btn btn-primary btn-large">确定</button>
-              <button type="button" data-dismiss="modal" class="sui-btn btn-default btn-large">取消</button>
+              <button id="btn_save" type="button" class="sui-btn btn-primary btn-large">确定</button>
+              <button type="reset" data-dismiss="modal" class="sui-btn btn-default btn-large">取消</button>
             </div>
           </div>
         </div>
@@ -96,24 +91,24 @@
           <li>
             <div class="sendGoods">
               <span>商品清单：</span>
+              {{#each orderGoods}}
               <ul class="yui3-g">
                 <li class="yui3-u-1-6">
-                  <img src="uploads/mobile.png">
+                  <img src="{{image}}">
                 </li>
                 <li class="yui3-u-2-3">
-                  <div class="desc">Apple iPhone 6s (A1700) 64G 玫瑰金色 移动联通电信4G手机硅胶透明防摔软壳 本色系列</div>
+                  <div class="desc">{{name}}</div>
                 </li>
                 <li class="yui3-u-1-12">
-                  <div class="price">￥5399.00</div>
+                  <div class="price">￥{{toFixed price}}</div>
                 </li>
                 <li class="yui3-u-1-12">
-                  <div class="num">x<strong>1</strong></div>
+                  <div class="num">x<strong>{{amount}}</strong></div>
                 </li>
               </ul>
+              {{/each}}
             </div>
           </li>
-          <li></li>
-          <li></li>
         </ul>
       </div>
       <div class="hr"></div>
@@ -131,6 +126,60 @@
   </div>
 </div>
 <div class="order-summary py-container">
-  <div class="static fl"><i class="number">1</i> 件商品，总商品金额 <i>¥5399.00</i></div>
+  <div class="static fl"><i class="number">{{orderTotalCount}}</i> 件商品，总商品金额 <i>¥{{order.order_price}}</i></div>
   <a class="sui-btn btn-danger btn-xlarge fr" href="pay.html">提交订单</a>
 </div>
+
+{{#contentFor 'scripts'}}
+<script src="/assets/js/sui.modal.js"></script>
+<script src="/assets/js/sui.transition.js"></script>
+<script>
+  $(function ($) {
+    var $addAddress = $('#add_address')
+    var $addForm = $addAddress.find('form')
+    var $addrDetail = $('.addr-detail')
+
+    // 这里写的代码在服务端作为普通字符串被 Handlebars 处理，需要注意我们如果希望在代码中使用 \{{}} 字符需要转义
+    var addrTemplate = '<li class="addr-item">\
+            <div class="con name"><a href="#">\{{cgn_name}}</a></div>\
+            <div class="con address">\{{cgn_name}} \{{cgn_address}} <span>\{{cgn_tel}}</span></div>\
+          </li>'
+
+    $('#btn_save').on('click', function () {
+      // 1. 校验文本框输入情况
+      var formArr = $addForm.serializeArray()
+      var isValidated = formArr.every(function (item) {
+        return !!item.value
+      })
+
+      if (!isValidated) return alert('必须填写完整信息')
+
+      var params = formArr.reduce(function (obj, next) {
+        obj[next.name] = next.value
+        return obj
+      }, {})
+      
+      // 2. 获取需要提交的每一个值
+      $.post('/member/address-add', params, function (res) {
+        // res => 返回属于我的全部地址列表
+        if (res.error)  return alert(res.error)
+
+        $addrDetail.empty()
+
+        res.data.forEach(function (item) {
+          var temp = addrTemplate
+
+          for (var key in item) {
+            temp = temp.replace('\{{' + key + '}}', item[key])
+          }
+
+          $addrDetail.append(temp)
+        })
+
+        // 3. 发送一个 AJAX 请求 将数据提交保存
+        $addAddress.modal('hide')
+      })
+    })
+  })
+</script>
+{{/contentFor}}

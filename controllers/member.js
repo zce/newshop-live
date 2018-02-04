@@ -7,7 +7,7 @@ const path = require('path')
 const util = require('util')
 const multer = require('multer')
 
-const { User } = require('../models')
+const { User, Consignee } = require('../models')
 const upload = multer({ dest: 'public/uploads/' })
 
 const rename = util.promisify(fs.rename)
@@ -90,4 +90,29 @@ exports.address = (req, res) => {
 
 exports.order = (req, res) => {
   res.render('member-order')
+}
+
+exports.addressAdd = (req, res) => {
+  // 1. 接收提交过来的数据
+  const { cgn_name, cgn_address, cgn_tel, cgn_code } = req.body
+  // 2. 判断
+
+  // 3. 持久化
+  Consignee.create({ 
+    user_id: req.session.currentUser.user_id,
+    cgn_name, 
+    cgn_address, 
+    cgn_tel, 
+    cgn_code 
+  })
+  .then(() => {
+    return Consignee.findAll({ where: { user_id: req.session.currentUser.user_id } })
+  })
+  .then(consignee => {
+    // 4. 响应
+    res.send({ data: consignee })
+  })
+  .catch(e => {
+    res.send({ error: e.message })
+  })
 }

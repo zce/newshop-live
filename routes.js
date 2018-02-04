@@ -38,6 +38,7 @@ router.get('/member', auth.required, memberController.index)
 router.get('/member/profile', auth.required, memberController.profile)
 router.post('/member/profile', auth.required, memberController.profilePost)
 router.get('/member/address', auth.required, memberController.address)
+router.post('/member/address-add', auth.required, memberController.addressAdd)
 router.get('/member/order', auth.required, memberController.order)
 
 router.get('/captcha', commonController.captcha)

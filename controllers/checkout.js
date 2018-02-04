@@ -2,7 +2,7 @@
  * 结算控制器
  */
 
-const { UserCart, Order, OrderGoods } = require('../models')
+const { Goods, UserCart, Order, OrderGoods, Consignee } = require('../models')
 
 /**
  * 生成一个随机的订单编号
@@ -71,14 +71,60 @@ exports.create = (req, res, next) => {
 /**
  * 结算一个订单
  */
-exports.index = (req, res) => {
+exports.index = (req, res, next) => {
   // 根据传递过来的订单编号获取订单信息
-  // 展示结算页面
-  res.render('checkout')
+  const { num } = req.query
+
+  Promise.resolve()
+    .then(() => {
+      if (!num) throw new Error('订单不存在')
+      return Order.findOne({ where: { order_number: num } })
+    })
+    .then(order => {
+      if (!order) throw new Error('订单不存在')
+      res.locals.order = order
+
+      return OrderGoods.findAll({ where: { order_id: order.order_id } })
+    })
+    .then(orderGoods => {
+      // 在绝大多数成熟电商系统中 订单商品中会包含当时这个商品的全部信息 而不是 单纯的 id 和 价格
+      if (!orderGoods.length) throw new Error('订单异常')
+
+      // 由于订单商品表中没有商品的额外信息，所以通过商品表查找
+      const tasks = orderGoods.map(og => {
+        // og => 每一条订单商品记录 （只包含 数量 价格~）
+        return Goods
+          .findOne({ where: { goods_id: og.goods_id } })
+          .then(goods => {
+            return {
+              image: goods.goods_small_logo,
+              name: goods.goods_name,
+              price: og.goods_price,
+              amount: og.goods_number
+            }
+          })
+      })
+      return Promise.all(tasks)
+    })
+    .then(orderGoods => {
+      // orderGoods => 当前这个订单中的每一件商品的 图片 名称 价格 数量
+      res.locals.orderGoods = orderGoods
+
+      res.locals.orderTotalCount = orderGoods.reduce((p, n) => p + n.amount, 0)
+
+      return Consignee.findAll({ where: { user_id: req.session.currentUser.user_id } })
+    })
+    .then(consignee => {
+      res.locals.consignee = consignee
+      
+      // 展示结算页面
+      res.render('checkout')
+    })
+    .catch(e => {
+      e.status = 404
+      next(e)
+    })
 }
-
-
-
 
 
   // // 1. 获取到需要添加到订单中的商品信息

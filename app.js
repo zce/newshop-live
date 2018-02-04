@@ -59,6 +59,11 @@ hbs.registerHelper('toFixed', function (input, opts) {
   return parseFloat(input).toFixed(2)
 })
 
+// 手机号掩码
+hbs.registerHelper('mobileMask', function (input, opts) {
+  return input.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2')
+})
+
 // 分页页码 helper
 hbs.registerHelper('pagination', function (current, total, opts) {
   const urlObj = url.parse(this.originalUrl, true)
